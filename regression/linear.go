@@ -5,7 +5,7 @@ import (
 	"errors"
 	"os"
 
-	// "golearn-lite/core"
+	"golearn-lite/core"
 	"golearn-lite/matrix"
 )
 
@@ -92,7 +92,7 @@ func (lr *LinearRegression) Load(path string) error {
 	return gob.NewDecoder(f).Decode(&lr.Coefficients)
 }
 
-func (lr* LinearRegression) GetParams() map[string]interface{} {
+func (lr *LinearRegression) GetParams() map[string]interface{} {
 	return map[string]interface{}{}
 }
 
@@ -112,3 +112,9 @@ func addBias(X matrix.Matrix) matrix.Matrix {
 
 	return matrix.New(biased)
 }
+
+
+var _ core.Model = (*LinearRegression)(nil)
+var _ core.Scorable = (*LinearRegression)(nil)
+var _ core.Serializable = (*LinearRegression)(nil)
+var _ core.Params = (*LinearRegression)(nil)

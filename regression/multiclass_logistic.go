@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"os"
 
+	"golearn-lite/core"
 	"golearn-lite/matrix"
 )
 
@@ -60,7 +61,7 @@ func (mc * MultiClassLogisticRegression) Predict(X matrix.Matrix) []float64 {
 	scores := make([][]float64, len(mc.Classes))
 
 	for i, class := range mc.Classes {
-		probs := mc.Classifiers[class].PredictClass(X)
+		probs := mc.Classifiers[class].Predict(X)
 		scores[i] = probs
 	}
 
@@ -123,3 +124,9 @@ func (mc *MultiClassLogisticRegression) SetParams(params map[string]interface{})
 
 	return nil
 }
+
+
+var _ core.Model = (*MultiClassLogisticRegression)(nil)
+var _ core.Scorable = (*MultiClassLogisticRegression)(nil)
+var _ core.Serializable = (*MultiClassLogisticRegression)(nil)
+var _ core.Params = (*MultiClassLogisticRegression)(nil)

@@ -1,10 +1,13 @@
 package neighbors
 
 import (
+	"encoding/gob"
 	"errors"
 	"math"
+	"os"
 	"sort"
 
+	"golearn-lite/core"
 	"golearn-lite/matrix"
 )
 
@@ -61,6 +64,26 @@ func (knn *KNN) Predict(X matrix.Matrix) []float64 {
 func (knn *KNN) Score(X matrix.Matrix, y []float64, metric func(yTrue, yPred []float64) float64) float64 {
 	yPred := knn.Predict(X)
 	return metric(y, yPred)
+}
+
+func (knn *KNN) Save(path string) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	return gob.NewEncoder(f).Encode(knn)
+}
+
+func (knn *KNN) Load(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	return gob.NewDecoder(f).Decode(knn)
 }
 
 func (knn *KNN) GetParams() map[string]interface{} {
@@ -136,3 +159,9 @@ func meanVote(neighbors []neighbor) float64 {
 
 	return sum / float64(len(neighbors))
 }
+
+
+var _ core.Model = (*KNN)(nil)
+var _ core.Scorable = (*KNN)(nil)
+var _ core.Serializable = (*KNN)(nil)
+var _ core.Params = (*KNN)(nil)

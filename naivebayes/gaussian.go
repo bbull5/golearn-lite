@@ -1,10 +1,13 @@
 package naivebayes
 
 import (
+	"os"
 	"errors"
 	"math"
 	"sort"
+	"encoding/gob"
 
+	"golearn-lite/core"
 	"golearn-lite/matrix"
 )
 
@@ -122,6 +125,26 @@ func (gnb *GaussianNB) Score(X matrix.Matrix, y []float64, metric func(yTrue, yP
 	return metric(y, yPred)
 }
 
+func (gnb *GaussianNB) Save(path string) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	return gob.NewEncoder(f).Encode(gnb)
+}
+
+func (gnb *GaussianNB) Load(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	return gob.NewDecoder(f).Decode(gnb)
+}
+
 func (gnb *GaussianNB) GetParams() map[string]interface{} {
 	return map[string]interface{}{}
 }
@@ -148,3 +171,9 @@ func argmax(m map[float64]float64) float64 {
 
 	return sorted[0].Key
 }
+
+
+var _ core.Model = (*GaussianNB)(nil)
+var _ core.Scorable = (*GaussianNB)(nil)
+var _ core.Serializable = (*GaussianNB)(nil)
+var _ core.Params = (*GaussianNB)(nil)

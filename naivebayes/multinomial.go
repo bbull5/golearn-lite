@@ -1,9 +1,12 @@
 package naivebayes
 
 import (
+	"os"
 	"errors"
 	"math"
+	"encoding/gob"
 
+	"golearn-lite/core"
 	"golearn-lite/matrix"
 )
 
@@ -100,6 +103,26 @@ func (mnb *MultinomialNB) Score(X matrix.Matrix, y []float64, metric func(yTrue,
 	return metric(y, yPred)
 }
 
+func (mnb *MultinomialNB) Save(path string) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	return gob.NewEncoder(f).Encode(mnb)
+}
+
+func (mnb *MultinomialNB) Load(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	return gob.NewDecoder(f).Decode(mnb)
+}
+
 func (mnb *MultinomialNB) GetParams() map[string]interface{} {
 	return map[string]interface{} {
 		"alpha": mnb.Alpha,
@@ -113,5 +136,11 @@ func (mnb *MultinomialNB) SetParams(params map[string]interface{}) error {
 
 	return nil
 }
+
+
+var _ core.Model = (*MultinomialNB)(nil)
+var _ core.Scorable = (*MultinomialNB)(nil)
+var _ core.Serializable = (*MultinomialNB)(nil)
+var _ core.Params = (*MultinomialNB)(nil)
 
 

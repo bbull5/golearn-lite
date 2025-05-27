@@ -6,6 +6,7 @@ import (
 	"math"
 	"os"
 
+	"golearn-lite/core"
 	"golearn-lite/matrix"
 )
 
@@ -60,7 +61,7 @@ func(lr *LogisticRegression) Fit(X matrix.Matrix, y[]float64) error {
 	return nil
 }
 
-func (lr *LogisticRegression) PredictClass(X matrix.Matrix) []float64 {
+func (lr *LogisticRegression) Predict(X matrix.Matrix) []float64 {
 	Xb := addBias(X)
 	nSamples := Xb.Rows
 	predictions := make([]float64, nSamples)
@@ -79,7 +80,7 @@ func (lr *LogisticRegression) PredictClass(X matrix.Matrix) []float64 {
 }
 
 func (lr *LogisticRegression) Score(X matrix.Matrix, y []float64, metric func(yTrue, yPred []float64) float64) float64 {
-	yPred := lr.PredictClass(X)
+	yPred := lr.Predict(X)
 	return metric(y, yPred)
 }
 
@@ -124,3 +125,9 @@ func (lr *LogisticRegression) SetParams(params map[string]interface{}) error {
 func sigmoid(z float64) float64 {
 	return 1.0 / (1.0 + math.Exp(-z))
 }
+
+
+var _ core.Model = (*LogisticRegression)(nil)
+var _ core.Scorable = (*LogisticRegression)(nil)
+var _ core.Serializable = (*LogisticRegression)(nil)
+var _ core.Params = (*LogisticRegression)(nil)
